@@ -1,0 +1,24 @@
+<form class="register-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <h1>Registration</h1>
+
+  <div class="register-form__email">
+    <mat-form-field appearance="outline" class="register-form__form-field">
+      <mat-label>{{formLabels.email}}</mat-label>
+      <input
+        matInput
+        [formControlName]="formControlNames.email"
+        [placeholder]="formPlaceholders.email"
+      >
+    </mat-form-field>
+  </div>
+
+  <div class="register-form__password">
+    <app-password-input
+      [formControlName]="formControlNames.password"
+      [label]="formLabels.password"
+      [placeholder]="formPlaceholders.password"
+    ></app-password-input>
+  </div>
+
+  <button class="register-form__submit" type="submit">Submit</button>
+</form>

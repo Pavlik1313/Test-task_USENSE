@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {PASSWORD_MIN_LENGTH, TransformToTypedForm} from "../../symbols";
+import {TransformToTypedForm} from "../../symbols";
 
 interface LoginFormModel {
   email: string;
@@ -28,15 +28,19 @@ export class RegisterFormComponent {
     password: 'Enter password...',
   }
 
+  protected errorMessages: {[K in keyof Partial<LoginFormModel>]: {[key: string]: string}} = {
+    email: {
+      required: "Email is required",
+      email: "Email must be valid"
+    },
+  }
+
   protected readonly form = new FormGroup<TransformToTypedForm<LoginFormModel>>({
     email: new FormControl<LoginFormModel['email']>('', [
       Validators.required,
       Validators.email,
     ]),
-    password: new FormControl<LoginFormModel['password']>('', [
-      Validators.required,
-      Validators.minLength(PASSWORD_MIN_LENGTH)
-    ])
+    password: new FormControl<LoginFormModel['password']>('',)
   })
 
   public onSubmit(): void {

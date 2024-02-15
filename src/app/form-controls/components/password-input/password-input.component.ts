@@ -1,5 +1,13 @@
 import {Component, forwardRef, Input, OnDestroy, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  FormControl,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR, ValidationErrors,
+  Validator,
+  Validators
+} from "@angular/forms";
 import {
   containsDigitsRegex,
   containsLettersRegex,
@@ -19,10 +27,15 @@ import {map, Observable, Subscription} from "rxjs";
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => PasswordInputComponent),
       multi: true,
+    },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => PasswordInputComponent),
+      multi: true,
     }
   ]
 })
-export class PasswordInputComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class PasswordInputComponent implements ControlValueAccessor, Validator, OnInit, OnDestroy {
   @Input() label: string;
   @Input() placeholder: string;
 
@@ -61,6 +74,11 @@ export class PasswordInputComponent implements ControlValueAccessor, OnInit, OnD
   public writeValue(value: string): void {
     this.passwordControl.setValue(value, {emitEvent: false});
   }
+
+  public validate(control: AbstractControl): ValidationErrors | null {
+    return this.passwordControl.errors;
+  }
+
   public registerOnChange(fn: (value: string) => void): void {
     this.onChange = fn;
   }

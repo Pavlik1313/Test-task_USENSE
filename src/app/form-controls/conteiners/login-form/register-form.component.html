@@ -10,6 +10,11 @@
         [placeholder]="formPlaceholders.email"
       >
     </mat-form-field>
+    @if (form.controls.email.invalid && (form.controls.email.dirty || form.controls.email.touched)) {
+      @for (error of form.controls.email.errors | keyvalue; track error) {
+        <mat-error>{{errorMessages.email[error.key]}}</mat-error>
+      }
+    }
   </div>
 
   <div class="register-form__password">

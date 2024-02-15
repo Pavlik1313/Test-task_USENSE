@@ -32,8 +32,8 @@ export class PasswordInputComponent implements ControlValueAccessor, OnInit, OnD
   ]);
 
   private internalErrorMessages: {[key: string]: string} = {
-    required: "The password is required",
-    minlength: "The password must be at least 8 characters long"
+    required: "Password is required",
+    minlength: "Password must be at least 8 characters long"
   }
 
   private _errorMessages: {[key: string]: string} = this.internalErrorMessages;

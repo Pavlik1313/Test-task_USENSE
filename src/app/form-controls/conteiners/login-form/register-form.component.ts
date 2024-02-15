@@ -49,8 +49,17 @@ export class RegisterFormComponent {
   })
 
   public onSubmit(): void {
+    if(this.form.invalid) {
+      this.markFormTouched();
+      return;
+    }
+
     window.alert(
-      this.form.valid ? `Email: ${this.form.value.email}; Password: ${this.form.value.password};` : 'Form is invalid'
+      `Email: ${this.form.value.email}; Password: ${this.form.value.password};`
     );
+  }
+
+  private markFormTouched(): void {
+    Object.values(this.form.controls).forEach(control => control.markAsTouched())
   }
 }

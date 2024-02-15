@@ -33,6 +33,9 @@ export class RegisterFormComponent {
       required: "Email is required",
       email: "Email must be valid"
     },
+    password: {
+      pattern: "Password must contain uppercase letters"
+    }
   }
 
   protected readonly form = new FormGroup<TransformToTypedForm<LoginFormModel>>({
@@ -40,7 +43,9 @@ export class RegisterFormComponent {
       Validators.required,
       Validators.email,
     ]),
-    password: new FormControl<LoginFormModel['password']>('',)
+    password: new FormControl<LoginFormModel['password']>('', [
+      Validators.pattern(/[A-Z]/) // Example of external validator
+    ])
   })
 
   public onSubmit(): void {

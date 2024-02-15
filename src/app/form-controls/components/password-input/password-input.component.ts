@@ -1,13 +1,5 @@
-import {Component, forwardRef, Input, OnDestroy, OnInit} from '@angular/core';
-import {
-  AbstractControl,
-  ControlValueAccessor,
-  FormControl,
-  NG_VALIDATORS,
-  NG_VALUE_ACCESSOR, ValidationErrors,
-  Validator,
-  Validators
-} from "@angular/forms";
+import {Component, Input, OnDestroy, OnInit, Self} from '@angular/core';
+import {ControlValueAccessor, FormControl, NgControl, Validators} from "@angular/forms";
 import {
   containsDigitsRegex,
   containsLettersRegex,
@@ -22,20 +14,8 @@ import {map, Observable, Subscription} from "rxjs";
   selector: 'app-password-input',
   templateUrl: './password-input.component.html',
   styleUrl: './password-input.component.scss',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => PasswordInputComponent),
-      multi: true,
-    },
-    {
-      provide: NG_VALIDATORS,
-      useExisting: forwardRef(() => PasswordInputComponent),
-      multi: true,
-    }
-  ]
 })
-export class PasswordInputComponent implements ControlValueAccessor, Validator, OnInit, OnDestroy {
+export class PasswordInputComponent implements ControlValueAccessor, OnInit, OnDestroy {
   @Input() label: string;
   @Input() placeholder: string;
 
@@ -51,17 +31,41 @@ export class PasswordInputComponent implements ControlValueAccessor, Validator, 
     Validators.minLength(PASSWORD_MIN_LENGTH)
   ]);
 
-  protected errorMessages: {[key: string]: string} = {
+  private internalErrorMessages: {[key: string]: string} = {
     required: "The password is required",
     minlength: "The password must be at least 8 characters long"
   }
 
+  private _errorMessages: {[key: string]: string} = this.internalErrorMessages;
+  @Input() set errorMessages(messages: {[key: string]: string}) {
+    this._errorMessages = {
+      ...this.internalErrorMessages,
+      ...messages,
+    }
+  }
+  get errorMessages(): {[key: string]: string} {
+    return this._errorMessages;
+  }
+
   private readonly subscription = new Subscription();
 
-  constructor() {
+  constructor(@Self() public controlDir: NgControl) {
+    controlDir.valueAccessor = this;
   }
 
   ngOnInit(): void {
+    const control = this.controlDir.control;
+
+    let validators = control.validator ?
+      [control.validator, this.passwordControl.validator] :
+      this.passwordControl.validator;
+
+    this.passwordControl.setValidators(validators);
+    control.setValidators(validators);
+
+    this.passwordControl.updateValueAndValidity();
+    control.updateValueAndValidity();
+
     this.subscription.add(
       this.passwordControl.valueChanges.subscribe(value => this.updateValue(value))
     );
@@ -73,10 +77,6 @@ export class PasswordInputComponent implements ControlValueAccessor, Validator, 
 
   public writeValue(value: string): void {
     this.passwordControl.setValue(value, {emitEvent: false});
-  }
-
-  public validate(control: AbstractControl): ValidationErrors | null {
-    return this.passwordControl.errors;
   }
 
   public registerOnChange(fn: (value: string) => void): void {
